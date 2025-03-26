@@ -1,24 +1,33 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import { CldUploadWidget } from "next-cloudinary";
 import { Button } from "../ui/button";
 import Image from "next/image";
 import { Plus, Trash } from "lucide-react";
 
-interface ImageUploadProps {
+interface ProductsImageUploadProps {
   value: string[];
-  onChange: (value: string) => void;
-  onRemove: (value: string) => void;
+  onChange: (value: string[]) => void;
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({
+const ProductsImageUpload: React.FC<ProductsImageUploadProps> = ({
   value,
   onChange,
-  onRemove,
 }) => {
-  const onSuccess = (result: any) => {
-    onChange(result.info.secure_url);
+  const [images, setImages] = useState<string[]>([]);
+  const handleSuccess = (result: any) => {
+    setImages((prev) => [...prev, result.info.secure_url]);
+    console.log("Images state" + images);
+  };
+  const onRemove = (url: string) => {
+    setImages(value);
+    setImages((prev) => [...prev.filter((image) => image !== url)]);
   };
 
+  useEffect(() => {
+    onChange(images);
+    console.log("Product Images Upload: " + images);
+  }, [images]);
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center gap-4">
@@ -26,6 +35,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
           <div key={url} className="relative">
             <div className="absolute top-0 right-0 z-10">
               <Button
+                type="button"
                 onClick={() => onRemove(url)}
                 size="sm"
                 className="bg-red-1 text-white"
@@ -45,9 +55,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       </div>
 
       <CldUploadWidget
-        options={{ multiple: true }}
         uploadPreset="upload_ecommerce"
-        onSuccess={onSuccess}
+        onSuccess={handleSuccess}
       >
         {({ open }) => {
           return (
@@ -57,7 +66,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
               onClick={() => open()}
             >
               <Plus className="h-4 w-4 mr-2" />
-              Upload an Image
+              Upload Image
             </Button>
           );
         }}
@@ -66,4 +75,4 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   );
 };
 
-export default ImageUpload;
+export default ProductsImageUpload;

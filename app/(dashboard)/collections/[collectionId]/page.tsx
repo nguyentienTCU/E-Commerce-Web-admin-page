@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import Loader from "@/components/custom ui/Loader";
 import CollectionForm from "@/components/collections/CollectionForm";
-import { useRouter } from "next/router";
 
 const CollectionDetails = ({
   params,

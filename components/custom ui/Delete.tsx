@@ -18,23 +18,26 @@ import { useRouter } from "next/navigation";
 
 interface DeleteProps {
   id: string;
+  item: string;
 }
 
-const Delete: React.FC<DeleteProps> = ({ id }) => {
+const Delete: React.FC<DeleteProps> = ({ id, item }) => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const renderItem = item === "products" ? "product" : "collection";
 
   const onDelete = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/collections/${id}`, {
+      const res = await fetch(`/api/${item}/${id}`, {
         method: "DELETE",
       });
 
       if (res.ok) {
         setLoading(false);
-        window.location.href = "/collections";
-        toast.success("Collection deleted");
+        console.log(item);
+        window.location.href = `/${item}`;
+        toast.success(`${renderItem} deleted`);
       }
     } catch (error) {
       console.log(error);
@@ -56,7 +59,7 @@ const Delete: React.FC<DeleteProps> = ({ id }) => {
           </AlertDialogTitle>
           <AlertDialogDescription>
             This action cannot be undone. This will permanently delete your
-            collection.
+            {renderItem}.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
