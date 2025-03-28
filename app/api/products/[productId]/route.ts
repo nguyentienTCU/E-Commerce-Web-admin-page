@@ -43,7 +43,8 @@ export const POST = async (
     await connectToDB();
     const { productId } = await params;
 
-    const product = await Product.findById(productId);
+    // Get the product and populate its collections
+    const product = await Product.findById(productId).populate("collections");
 
     if (!product) {
       return new NextResponse("Product not found", { status: 404 });
@@ -66,42 +67,41 @@ export const POST = async (
       return new NextResponse("Not enough data", { status: 400 });
     }
 
-    //inside initial collections, outside new collections => new added collections
+    // Get the current collection IDs
+    const currentCollectionIds = product.collections.map((col: any) =>
+      col._id.toString()
+    );
+
+    // Determine added and removed collections
     const addedCollections = collections.filter(
-      (collectionId: string) => !product.collections.includes(collectionId)
+      (collectionId: string) => !currentCollectionIds.includes(collectionId)
     );
 
-    console.log("initial collection: " + product.collections);
-    console.log("new collection: " + collections);
-    console.log("added collection: " + addedCollections);
-
-    const initialCollection: string[] = product.collections;
-    const newCollection: string[] = collections;
-
-    const removedCollections: string[] = initialCollection.filter(
-      (collectionId: string) => !newCollection.includes(collectionId)
+    const removedCollections = currentCollectionIds.filter(
+      (collectionId: string) => !collections.includes(collectionId)
     );
 
-    console.log("initial collection: " + initialCollection);
-    console.log("new collection: " + newCollection);
-    console.log("removed collection: " + removedCollections);
-
+    // First update all collection references
     await Promise.all([
-      // Update added collections with this product
+      // Add product reference to new collections
       ...addedCollections.map((collectionId: string) =>
-        Collection.findByIdAndUpdate(collectionId, {
-          $push: { products: product._id },
-        })
+        Collection.findByIdAndUpdate(
+          collectionId,
+          { $addToSet: { products: product._id } },
+          { new: true }
+        )
       ),
-
-      // Update removed collections without this product
+      // Remove product reference from old collections
       ...removedCollections.map((collectionId: string) =>
-        Collection.findByIdAndUpdate(collectionId, {
-          $pull: { products: product._id },
-        })
+        Collection.findByIdAndUpdate(
+          collectionId,
+          { $pull: { products: product._id } },
+          { new: true }
+        )
       ),
     ]);
 
+    // Then update the product
     const updatedProduct = await Product.findByIdAndUpdate(
       product._id,
       {

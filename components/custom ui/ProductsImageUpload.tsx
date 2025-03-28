@@ -14,24 +14,33 @@ const ProductsImageUpload: React.FC<ProductsImageUploadProps> = ({
   value,
   onChange,
 }) => {
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<string[]>(value);
+
   const handleSuccess = (result: any) => {
-    setImages((prev) => [...prev, result.info.secure_url]);
-    console.log("Images state" + images);
+    const url = result.info.secure_url;
+    setImages((currentImages) => {
+      const newImages = [...currentImages, url];
+      onChange(newImages);
+      return newImages;
+    });
   };
+
   const onRemove = (url: string) => {
-    setImages(value);
-    setImages((prev) => [...prev.filter((image) => image !== url)]);
+    setImages((currentImages) => {
+      const newImages = currentImages.filter((image) => image !== url);
+      onChange(newImages);
+      return newImages;
+    });
   };
 
   useEffect(() => {
-    onChange(images);
-    console.log("Product Images Upload: " + images);
-  }, [images]);
+    setImages(value);
+  }, [value]);
+
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center gap-4">
-        {value.map((url) => (
+        {images.map((url) => (
           <div key={url} className="relative">
             <div className="absolute top-0 right-0 z-10">
               <Button
