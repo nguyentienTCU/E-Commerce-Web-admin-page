@@ -31,7 +31,7 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
 
   const formSchema = z.object({
     title: z.string().min(2).max(50),
-    description: z.string().min(2).max(50).trim(),
+    description: z.string().min(2).max(5000).trim(),
     image: z.string(),
   });
 

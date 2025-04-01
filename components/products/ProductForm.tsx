@@ -33,7 +33,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
 
   const formSchema = z.object({
     title: z.string().min(2).max(50),
-    description: z.string().min(2).max(500).trim(),
+    description: z.string().min(2).max(5000).trim(),
     media: z.array(z.string()),
     category: z.string().min(2).max(50),
     collections: z.array(z.string()),
