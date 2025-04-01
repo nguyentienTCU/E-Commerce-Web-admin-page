@@ -69,18 +69,31 @@ const CollectionForm: React.FC<CollectionFormProps> = ({ initialData }) => {
           : "/api/collections";
         const response = await fetch(url, {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify(values),
         });
 
-        if (response.ok) {
-          setLoading(false);
-          toast.success(`Collection ${initialData ? "updated" : "created"}`);
-          window.location.href = "/collections";
-          router.push("/collections");
+        const data = await response.json();
+        console.log(data);
+
+        if (!response.ok) {
+          throw new Error(data.message || "Something went wrong");
         }
+
+        toast.success(
+          initialData ? "Collection updated" : "Collection created"
+        );
+        router.push("/collections");
+        router.refresh();
       } catch (error) {
         console.log("[collections_POST]", error);
-        toast.error("Something went wrong! Please try again!");
+        toast.error(
+          error instanceof Error ? error.message : "Something went wrong"
+        );
+      } finally {
+        setLoading(false);
       }
     }
   }

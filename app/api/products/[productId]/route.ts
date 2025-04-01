@@ -37,7 +37,10 @@ export const POST = async (
     const { userId } = await auth();
 
     if (!userId) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return NextResponse.json(
+        { message: "Unauthorized. Please login or register" },
+        { status: 401 }
+      );
     }
 
     await connectToDB();
@@ -134,7 +137,10 @@ export const DELETE = async (
     const { userId } = await auth();
 
     if (!userId) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return NextResponse.json(
+        { message: "Unauthorized. Please login or register" },
+        { status: 403 }
+      );
     }
 
     await connectToDB();

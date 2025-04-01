@@ -117,17 +117,21 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
         });
 
         console.log(values);
-
-        if (response.ok) {
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.message || "Something went wrong");
+        } else {
           setLoading(false);
           toast.success(`Product ${initialData ? "updated" : "created"}`);
           window.location.href = "/products";
           router.push("/products");
         }
-        console.log(response);
       } catch (error) {
         console.log("[products_POST]", error);
-        toast.error("Something went wrong! Please try again!");
+        toast.error(
+          error instanceof Error ? error.message : "Something went wrong"
+        );
+        router.push("/products");
       }
     }
   }

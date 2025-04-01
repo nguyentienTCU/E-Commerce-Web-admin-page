@@ -3,13 +3,14 @@ import { navLinks } from "@/lib/constant";
 import Image from "next/image";
 import React, { useState } from "react";
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
-import { Menu } from "lucide-react";
+import { UserButton, useUser } from "@clerk/nextjs";
+import { CircleUserRound, Menu } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 const TopBar = () => {
   const [dropdownMenu, setDropdownMenu] = useState(false);
   const pathname = usePathname();
+  const { user } = useUser();
 
   return (
     <div className="sticky top-0 z-20 w-full flex justify-between items-center px-8 py-4 bg-blue-2 shadow-xl lg:hidden">
@@ -49,7 +50,13 @@ const TopBar = () => {
           </div>
         )}
 
-        <UserButton />
+        {user ? (
+          <UserButton />
+        ) : (
+          <Link href="/sign-in">
+            <CircleUserRound />
+          </Link>
+        )}
       </div>
     </div>
   );

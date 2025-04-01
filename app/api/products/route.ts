@@ -10,7 +10,10 @@ export const POST = async (req: NextRequest) => {
     const { userId } = await auth();
 
     if (!userId) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return NextResponse.json(
+        { message: "Unauthorized. Please login or register" },
+        { status: 401 }
+      );
     }
 
     await connectToDB();
