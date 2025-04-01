@@ -11,7 +11,10 @@ export const GET = async (
   try {
     await connectToDB();
     const { collectionId } = await params;
-    const collection = await Collection.findById(collectionId);
+    const collection = await Collection.findById(collectionId).populate({
+      path: "products",
+      model: Product,
+    });
     if (!collection) {
       return new NextResponse(
         JSON.stringify({ message: "Collection not found" }),
@@ -33,7 +36,10 @@ export const POST = async (
     const { userId } = await auth();
 
     if (!userId) {
-      return new NextResponse("Unauthorized", { status: 403 });
+      return NextResponse.json(
+        { message: "Unauthorized. Please login or register first" },
+        { status: 403 }
+      );
     }
 
     await connectToDB();
@@ -73,7 +79,10 @@ export const DELETE = async (
     const { userId } = await auth();
 
     if (!userId) {
-      return new NextResponse("Unauthorized", { status: 403 });
+      return NextResponse.json(
+        { message: "Unauthorized. Please login or register" },
+        { status: 403 }
+      );
     }
 
     await connectToDB();
@@ -91,3 +100,5 @@ export const DELETE = async (
     return new NextResponse("Internal server error", { status: 500 });
   }
 };
+
+export const dynamic = "force-dynamic";

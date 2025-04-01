@@ -33,15 +33,22 @@ const Delete: React.FC<DeleteProps> = ({ id, item }) => {
         method: "DELETE",
       });
 
+      const data = await res.json();
+      console.log(data);
+
       if (res.ok) {
         setLoading(false);
         console.log(item);
         window.location.href = `/${item}`;
         toast.success(`${renderItem} deleted`);
+      } else {
+        throw new Error(data.message || "Something went wrong");
       }
     } catch (error) {
       console.log(error);
-      toast.error("Something went wrong. Please try again!");
+      toast.error(
+        error instanceof Error ? error.message : "Something went wrong"
+      );
     }
   };
 

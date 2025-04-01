@@ -33,7 +33,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
 
   const formSchema = z.object({
     title: z.string().min(2).max(50),
-    description: z.string().min(2).max(500).trim(),
+    description: z.string().min(2).max(5000).trim(),
     media: z.array(z.string()),
     category: z.string().min(2).max(50),
     collections: z.array(z.string()),
@@ -117,17 +117,21 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData }) => {
         });
 
         console.log(values);
-
-        if (response.ok) {
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.message || "Something went wrong");
+        } else {
           setLoading(false);
           toast.success(`Product ${initialData ? "updated" : "created"}`);
           window.location.href = "/products";
           router.push("/products");
         }
-        console.log(response);
       } catch (error) {
         console.log("[products_POST]", error);
-        toast.error("Something went wrong! Please try again!");
+        toast.error(
+          error instanceof Error ? error.message : "Something went wrong"
+        );
+        router.push("/products");
       }
     }
   }

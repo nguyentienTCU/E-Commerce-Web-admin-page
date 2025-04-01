@@ -3,11 +3,13 @@ import { navLinks } from "@/lib/constant";
 import Image from "next/image";
 import React from "react";
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
+import { CircleUserRound } from "lucide-react";
 
 const LeftSideBar = () => {
   const pathname = usePathname();
+  const { user } = useUser();
 
   return (
     <div className="h-screen left-0 top-0 sticky p-10 flex flex-col gap-16 bg-blue-2 shadow-xl max-lg:hidden">
@@ -27,7 +29,13 @@ const LeftSideBar = () => {
       </div>
 
       <div className="flex gap-4 text-body-medium items-center">
-        <UserButton />
+        {user ? (
+          <UserButton />
+        ) : (
+          <Link href="/sign-in">
+            <CircleUserRound />
+          </Link>
+        )}
         <p>Edit Profile</p>
       </div>
     </div>

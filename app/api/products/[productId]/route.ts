@@ -22,7 +22,14 @@ export const GET = async (
         { status: 404 }
       );
     }
-    return NextResponse.json(product, { status: 200 });
+    return NextResponse.json(product, {
+      status: 200,
+      headers: {
+        "Access-Control-Allow-Origin": `${process.env.ECOMMERCE_STORE_URL}`,
+        "Access-Control-Allow-Methods": "GET",
+        "Access-Control-Allow-Headers": "Content-Type",
+      },
+    });
   } catch (error) {
     console.log("[productId_GET]", error);
     return new NextResponse("Internal server error", { status: 500 });
@@ -37,7 +44,10 @@ export const POST = async (
     const { userId } = await auth();
 
     if (!userId) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return NextResponse.json(
+        { message: "Unauthorized. Please login or register" },
+        { status: 401 }
+      );
     }
 
     await connectToDB();
@@ -134,7 +144,10 @@ export const DELETE = async (
     const { userId } = await auth();
 
     if (!userId) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return NextResponse.json(
+        { message: "Unauthorized. Please login or register" },
+        { status: 403 }
+      );
     }
 
     await connectToDB();
